@@ -1,0 +1,40 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+}
+
+#game-board {
+  margin: 25px;
+  display: flex;
+}
+
+.game-cell {
+  text-align: center;
+  color: #000;
+  background-color: #fff;
+  border: 1px solid gray;
+  flex-direction: column;
+  place-content: center;
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  display: flex;
+}
+
+.game-cell.un-revealed {
+  color: #fff;
+  background-color: #000;
+}
+
+.game-cell.exploded {
+  background-color: red;
+}
+
+.cell-row {
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+/*# sourceMappingURL=index.3a01df49.css.map */
