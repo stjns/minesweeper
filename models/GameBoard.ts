@@ -24,16 +24,16 @@ export class GameBoard {
         const mineMap: CellCoordinate[] = Array(mineCount);
 
         for (let m = 0; m < mineCount; m++) {
-            const randomCellNum = Math.floor(Math.random() * cellArray.length) - 1;
+            const randomCellNum = Math.floor(Math.random() * cellArray.length);
             const whichCell = cellArray[randomCellNum];
-            cellArray = cellArray.splice(randomCellNum, 1);
+            cellArray.splice(randomCellNum, 1);
             let mineX = 0;
             let mineY = 0;
 
             if (whichCell < width) {
                 mineX = whichCell;
             } else {
-                mineX = ~(whichCell / width);
+                mineX = Math.floor(whichCell / width);
                 mineY = whichCell % width;
             }
 
@@ -48,7 +48,7 @@ export class GameBoard {
 
     public populateBoard(): void {
         const mineMap = this.generateMineMap(this.boardWidth, this.boardHeight, this.mineCount);
-
+        console.log(mineMap);
         //first generate the board
         for(let y = 0; y < this.boardHeight; y++) {
             for(let x = 0; x < this.boardWidth; x++) {
