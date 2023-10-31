@@ -48,11 +48,12 @@ export class GameBoard {
 
     public populateBoard(): void {
         const mineMap = this.generateMineMap(this.boardWidth, this.boardHeight, this.mineCount);
-        console.log(mineMap);
+  
         //first generate the board
         for(let y = 0; y < this.boardHeight; y++) {
             for(let x = 0; x < this.boardWidth; x++) {
-                const newCell = new GameCell(this.isMined(x,y,mineMap), () => this.propagateEmptyCell(x, y));
+                const newCell = new GameCell(this.isMined(x,y,mineMap), (result:boolean) => 
+                    this.cellRevealCallback(result, x, y));
                 this.cells[x][y] = newCell;
             }
         }
@@ -87,8 +88,22 @@ export class GameBoard {
         }
     }
     
-    private propagateEmptyCell(x: number, y: number) {
-        if (this.cells[x][y].isEmpty()) {
+    /*
+     * When a cell is revealed, this function is run to see what actions
+     * the board should take, eg declare win, loss, or propagate an empty
+     * cell field. In the latter case, this method is recursive.
+     * 
+     * If the cell is not empty or mined, we don't need to do anything.
+     * 
+     * result: false if the cell is mined, true if it is
+     * x, y: coordinates for the revealed cell
+     */
+    private cellRevealCallback(result: boolean, x: number, y: number) {
+        if (result) {
+            //explode
+            this.disableAllCells();
+        }
+        else if (this.cells[x][y].isEmpty()) {
             for (let x2 = x-1; x2 < x+2; x2++) {
                 for (let y2 = y-1; y2 < y+2; y2++) {
                     if (x2 >= 0 
@@ -99,9 +114,35 @@ export class GameBoard {
                             this.cells[x2][y2].reveal();
 
                         if (this.cells[x2][y2].isEmpty())
-                            this.propagateEmptyCell(x2, y2);
+                            this.cellRevealCallback(false, x2, y2);
                     }
                 }
+            }
+        }
+        else {
+            //check for win
+            if (this.userHasWon()) {
+                this.disableAllCells();
+                alert("You win!");
+            }
+        }
+    }
+
+    private userHasWon(): boolean {
+        for(const row of this.cells) {
+            for (const cell of row) {
+                if (!cell.isRevealed() && !cell.mined)
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
+    private disableAllCells(): void {
+        for(const row of this.cells) {
+            for(const cell of row) {
+                cell.disable();
             }
         }
     }

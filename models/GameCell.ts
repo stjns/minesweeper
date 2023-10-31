@@ -1,16 +1,17 @@
 export class GameCell {
     readonly mined: boolean = false;
     readonly el: HTMLDivElement;
-    private readonly emptyCellCallback: Function;
+    private readonly cellRevealCallback: Function;
     private mineNeighbors: number = 0; 
 
-    private flagged: boolean = false;
-    private revealed: boolean = false;
+    private flagged = false;
+    private revealed = false;
+    private disabled = false;
 
-    constructor(mined: boolean = false, emptyCellCallback: Function) {
+    constructor(mined: boolean = false, cellRevealCallback: Function) {
         this.mined = mined;
         this.el = <HTMLDivElement>document.createElement('div');
-        this.emptyCellCallback = emptyCellCallback;
+        this.cellRevealCallback = cellRevealCallback;
 
         if (mined) this.mineNeighbors = 1;
 
@@ -37,17 +38,20 @@ export class GameCell {
             if (this.mined) {
                 this.el.classList.add('exploded');
                 this.el.innerHTML = '&#x1f4a3;'
+                this.cellRevealCallback(true);
             } else {
                 if (this.mineNeighbors > 0)
                     this.el.textContent = this.numNearbyMines().toString();
-                else
-                    this.emptyCellCallback();
+                
+                this.cellRevealCallback(false);
             }
         } 
     }
 
+    public disable = () => this.disabled = true;
+
     private onCellClick(): void {
-        if (!this.isRevealed() && !this.isFlagged()) {
+        if (!this.disabled && !this.isRevealed() && !this.isFlagged()) {
             this.reveal();
             if (this.numNearbyMines() === 0) {
 
@@ -56,7 +60,7 @@ export class GameCell {
     }
 
     private onFlagToggle(): void {
-        if (!this.isRevealed()) {
+        if (!this.disabled && !this.isRevealed()) {
             if (!this.isFlagged()) {
                 this.el.innerHTML = '&#x26f3;';
             } else {
