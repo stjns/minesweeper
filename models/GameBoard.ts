@@ -1,32 +1,65 @@
 import { GameCell } from "./GameCell";
+import { CellCoordinate } from "./CellCoordinate";
 
 export class GameBoard {
     readonly boardWidth: number;
     readonly boardHeight: number;
+    readonly mineCount: number;
 
     private cells: GameCell[][];
 
-    constructor(width: number, height: number) {
+    constructor(width: number, height: number, mines: number) {
         this.boardHeight = height;
         this.boardWidth = width;
+        this.mineCount = mines;
 
         this.cells = [...Array(width)].map(e => Array(height));
 
         this.populateBoard();
     }
 
+    private generateMineMap(width: number, height: number, mineCount: number): CellCoordinate[] {
+        let cellCount = height * width;
+        let cellArray: number[] = [...Array(cellCount).keys()];
+        const mineMap: CellCoordinate[] = Array(mineCount);
+
+        for (let m = 0; m < mineCount; m++) {
+            const randomCellNum = Math.floor(Math.random() * cellArray.length) - 1;
+            const whichCell = cellArray[randomCellNum];
+            cellArray = cellArray.splice(randomCellNum, 1);
+            let mineX = 0;
+            let mineY = 0;
+
+            if (whichCell < width) {
+                mineX = whichCell;
+            } else {
+                mineX = ~(whichCell / width);
+                mineY = whichCell % width;
+            }
+
+            mineMap[m] = new CellCoordinate(mineX, mineY);
+        }
+
+        return mineMap
+    }
+
+    private isMined = (x: number, y: number, map: CellCoordinate[]) => 
+        map.filter(m => m.x === x && m.y === y).length === 1;
+
     public populateBoard(): void {
+        const mineMap = this.generateMineMap(this.boardWidth, this.boardHeight, this.mineCount);
+
         //first generate the board
-        for(let y = 0; y < this.boardWidth; y++) {
-            for(let x = 0; x < this.boardHeight; x++) {
-                const newCell = new GameCell(this.isMined(), () => this.propagateEmptyCell(x, y));
+        for(let y = 0; y < this.boardHeight; y++) {
+            for(let x = 0; x < this.boardWidth; x++) {
+                const newCell = new GameCell(this.isMined(x,y,mineMap), () => this.propagateEmptyCell(x, y));
                 this.cells[x][y] = newCell;
             }
         }
 
         //then calculate the mined neighbors
-        for(let y = 0; y < this.boardWidth; y++) {
-            for(let x = 0; x < this.boardHeight; x++) {
+        for(let y = 0; y < this.boardHeight; y++) {
+            for(let x = 0; x < this.boardWidth; x++) {
                 if(!this.cells[x][y].mined) {
                     let count = 0;
 
@@ -76,20 +109,16 @@ export class GameBoard {
     public generateInitialBoard(): HTMLDivElement {
         const mainDiv: HTMLDivElement = document.createElement("div");
 
-        for(let y = 0; y < this.boardWidth; y++) {
+        for(let y = 0; y < this.boardHeight; y++) {
             const newCellRow = <HTMLDivElement>document.createElement("div");
             newCellRow.classList.add("cell-row");
 
-            for (let x = 0; x < this.boardHeight; x++) {
+            for (let x = 0; x < this.boardWidth; x++) {
                 newCellRow.appendChild(this.cells[x][y].el);
             }
 
             mainDiv.appendChild(newCellRow);
         }
         return mainDiv;
-    }
-
-    private isMined(): boolean {
-        return Math.floor(Math.random() * 5) === 1;
     }
 }
