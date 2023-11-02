@@ -11,6 +11,8 @@ TODO
 3. mobile optimization/controls
 4. actual styling
 5. ability to generate a "no guess" version
+6. win when all mines are marked
+7. mine counter
 
 I'm currently using Parcel, so to run
 
