@@ -6,6 +6,8 @@ export class GameBoard {
     readonly boardHeight: number;
     readonly mineCount: number;
 
+    private virginBoard = true;
+
     private cells: GameCell[][];
 
     constructor(width: number, height: number, mines: number) {
@@ -18,26 +20,38 @@ export class GameBoard {
         this.populateBoard();
     }
 
-    private generateMineMap(width: number, height: number, mineCount: number): CellCoordinate[] {
-        let cellCount = height * width;
-        let cellArray: number[] = [...Array(cellCount).keys()];
-        const mineMap: CellCoordinate[] = Array(mineCount);
+    private generateMineMap(
+        initialX: number, 
+        initialY: number, 
+        width: number, 
+        height: number, 
+        mineCount: number): CellCoordinate[] {
+        const cellArray: CellCoordinate[] = [];
+        const mineMap: CellCoordinate[] = [];
 
-        for (let m = 0; m < mineCount; m++) {
-            const randomCellNum = Math.floor(Math.random() * cellArray.length);
-            const whichCell = cellArray[randomCellNum];
-            cellArray.splice(randomCellNum, 1);
-            let mineX = 0;
-            let mineY = 0;
-
-            if (whichCell < width) {
-                mineX = whichCell;
-            } else {
-                mineX = Math.floor(whichCell / width);
-                mineY = whichCell % width;
+        //populate full cellArray
+        for(let y = 0; y < height; y++) {
+            for(let x = 0; x < width; x++) {
+                cellArray.push(new CellCoordinate(x, y));
             }
+        }
 
-            mineMap[m] = new CellCoordinate(mineX, mineY);
+        //remove the initial clicked cell and all it's immediate neighbors
+        //as possible locations for a mine
+        const mineableCells: CellCoordinate[] = [];
+        for(const cell of cellArray) {
+            if ((cell.x >= initialX-1 && cell.x <= initialX+1)
+                && (cell.y >= initialY-1 && cell.y <= initialY+1)) {
+                    continue;
+                }
+            mineableCells.push(cell);
+        }
+       
+        //add the specified number of mines randomly to the remaining cells
+        for (let m = 0; m < mineCount; m++) {
+            const randomCellNum = Math.floor(Math.random() * mineableCells.length);
+            
+            mineMap.push(...mineableCells.splice(randomCellNum, 1));
         }
 
         return mineMap
@@ -47,39 +61,39 @@ export class GameBoard {
         map.filter(m => m.x === x && m.y === y).length === 1;
 
     public populateBoard(): void {
-        const mineMap = this.generateMineMap(this.boardWidth, this.boardHeight, this.mineCount);
-  
         //first generate the board
         for(let y = 0; y < this.boardHeight; y++) {
             for(let x = 0; x < this.boardWidth; x++) {
-                const newCell = new GameCell(this.isMined(x,y,mineMap), (result:boolean) => 
+                const newCell = new GameCell((result:boolean) => 
                     this.cellRevealCallback(result, x, y));
                 this.cells[x][y] = newCell;
             }
         }
+    }
 
+    private calculateMinedNeighbors(): void {
         //then calculate the mined neighbors
         for(let y = 0; y < this.boardHeight; y++) {
             for(let x = 0; x < this.boardWidth; x++) {
-                if(!this.cells[x][y].mined) {
+                if(!this.cells[x][y].isMined()) {
                     let count = 0;
 
                     //calculate current row
-                    if (x > 0 && this.cells[x-1][y].mined) count++;
-                    if (x < this.boardWidth - 1 && this.cells[x+1][y].mined) count++;
+                    if (x > 0 && this.cells[x-1][y].isMined()) count++;
+                    if (x < this.boardWidth - 1 && this.cells[x+1][y].isMined()) count++;
     
                     //calculate above row
                     if (y > 0) {
-                        if (x > 0 && this.cells[x-1][y-1].mined) count++;
-                        if (this.cells[x][y-1].mined) count++;
-                        if (x < this.boardWidth - 1 && this.cells[x+1][y-1].mined) count++;
+                        if (x > 0 && this.cells[x-1][y-1].isMined()) count++;
+                        if (this.cells[x][y-1].isMined()) count++;
+                        if (x < this.boardWidth - 1 && this.cells[x+1][y-1].isMined()) count++;
                     }
     
                     //calculate below row
                     if (y < this.boardHeight - 1) {
-                        if (x > 0 && this.cells[x-1][y+1].mined) count++;
-                        if (this.cells[x][y+1].mined) count++;
-                        if (x < this.boardWidth - 1 && this.cells[x+1][y+1].mined) count++;
+                        if (x > 0 && this.cells[x-1][y+1].isMined()) count++;
+                        if (this.cells[x][y+1].isMined()) count++;
+                        if (x < this.boardWidth - 1 && this.cells[x+1][y+1].isMined()) count++;
                     }
     
                     this.cells[x][y].setMinedNeighbors(count);
@@ -98,12 +112,33 @@ export class GameBoard {
      * result: false if the cell is mined, true if it is
      * x, y: coordinates for the revealed cell
      */
-    private cellRevealCallback(result: boolean, x: number, y: number) {
-        if (result) {
+    private cellRevealCallback(mined: boolean, x: number, y: number) {
+        if (this.virginBoard) {
+            const mineMap = this.generateMineMap(
+                x,
+                y,
+                this.boardWidth, 
+                this.boardHeight, 
+                this.mineCount
+            );
+
+            for(let y = 0; y < this.boardHeight; y++) {
+                for(let x = 0; x < this.boardWidth; x++) {
+                    if (mineMap.some(c => c.x === x && c.y === y))
+                        this.cells[x][y].arm();
+                }
+            }
+
+            this.calculateMinedNeighbors();
+            this.virginBoard = false;
+        }
+
+        if (mined) {
             //explode
             this.disableAllCells();
         }
         else if (this.cells[x][y].isEmpty()) {
+            //propagate empty cells
             for (let x2 = x-1; x2 < x+2; x2++) {
                 for (let y2 = y-1; y2 < y+2; y2++) {
                     if (x2 >= 0 
@@ -122,8 +157,18 @@ export class GameBoard {
         else {
             //check for win
             if (this.userHasWon()) {
+                this.flagAllMines();
                 this.disableAllCells();
                 alert("You win!");
+            }
+        }
+    }
+
+    private flagAllMines(): void {
+        for (const row of this.cells) {
+            for (const cell of row) {
+                if (cell.isMined() && !cell.isFlagged())
+                    cell.onFlagToggle();
             }
         }
     }
@@ -131,7 +176,7 @@ export class GameBoard {
     private userHasWon(): boolean {
         for(const row of this.cells) {
             for (const cell of row) {
-                if (!cell.isRevealed() && !cell.mined)
+                if (!cell.isRevealed() && !cell.isMined())
                     return false;
             }
         }
