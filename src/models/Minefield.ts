@@ -1,14 +1,14 @@
-import { GameCell } from "./GameCell";
-import { CellCoordinate } from "./CellCoordinate";
+import { Cell } from './Cell';
+import { CellCoordinate } from './CellCoordinate';
 
-export class GameBoard {
+export class Minefield {
     readonly boardWidth: number;
     readonly boardHeight: number;
     readonly mineCount: number;
 
-    private virginBoard = true;
+    private virginBoard = true; //new, untouched minefield
 
-    private cells: GameCell[][];
+    private cells: Cell[][]; //the virtual representation of the board
 
     constructor(width: number, height: number, mines: number) {
         this.boardHeight = height;
@@ -20,26 +20,28 @@ export class GameBoard {
         this.populateBoard();
     }
 
+    //create a randomized minefield based on height/width/mines specified
+    //leave a gap at the point of the initial click
     private generateMineMap(
         initialX: number, 
         initialY: number, 
         width: number, 
         height: number, 
         mineCount: number): CellCoordinate[] {
-        const cellArray: CellCoordinate[] = [];
-        const mineMap: CellCoordinate[] = [];
+        const allCells: CellCoordinate[] = []; //all possible cells
+        const minedCells: CellCoordinate[] = []; //cells that have a mine
 
         //populate full cellArray with all possible cell coordinates
         for(let y = 0; y < height; y++) {
             for(let x = 0; x < width; x++) {
-                cellArray.push(new CellCoordinate(x, y));
+                allCells.push(new CellCoordinate(x, y));
             }
         }
 
         //remove the initial clicked cell and all it's immediate neighbors
         //as possible locations for a mine
         const mineableCells: CellCoordinate[] = [];
-        for(const cell of cellArray) {
+        for(const cell of allCells) {
             if ((cell.x >= initialX-1 && cell.x <= initialX+1)
                 && (cell.y >= initialY-1 && cell.y <= initialY+1)) {
                     continue;
@@ -50,24 +52,24 @@ export class GameBoard {
         //add the specified number of mines randomly to the remaining cells
         for (let m = 0; m < mineCount; m++) {
             const randomCellNum = Math.floor(Math.random() * mineableCells.length);
-            
-            mineMap.push(...mineableCells.splice(randomCellNum, 1));
+            minedCells.push(...mineableCells.splice(randomCellNum, 1));
         }
 
-        return mineMap
+        return minedCells
     }
 
     public populateBoard(): void {
         //first generate the board
         for(let y = 0; y < this.boardHeight; y++) {
             for(let x = 0; x < this.boardWidth; x++) {
-                const newCell = new GameCell((result:boolean) => 
+                const newCell = new Cell((result:boolean) => 
                     this.cellRevealCallback(result, x, y));
                 this.cells[x][y] = newCell;
             }
         }
     }
 
+    //set the number that will appear on the cells near a mine
     private calculateMinedNeighbors(): void {
         for(let y = 0; y < this.boardHeight; y++) {
             for(let x = 0; x < this.boardWidth; x++) {
@@ -158,7 +160,7 @@ export class GameBoard {
                 this.flagAllMines();
                 this.disableAllCells();
                 //TODO replace alert with something better
-                alert("You win!");
+                alert('You win!');
             }
         }
     }
@@ -168,7 +170,7 @@ export class GameBoard {
         for (const row of this.cells) {
             for (const cell of row) {
                 if (cell.isMined() && !cell.isFlagged())
-                    cell.onFlagToggle();
+                    cell.toggleFlag();
             }
         }
     }
@@ -197,14 +199,14 @@ export class GameBoard {
 
     //start a new game!
     public newGame(): HTMLDivElement {
-        const mainDiv: HTMLDivElement = document.createElement("div");
+        const mainDiv: HTMLDivElement = document.createElement('div');
 
         for(let y = 0; y < this.boardHeight; y++) {
-            const newCellRow = <HTMLDivElement>document.createElement("div");
-            newCellRow.classList.add("cell-row");
+            const newCellRow = <HTMLDivElement>document.createElement('div');
+            newCellRow.classList.add('cell-row');
 
             for (let x = 0; x < this.boardWidth; x++) {
-                newCellRow.appendChild(this.cells[x][y].el);
+                newCellRow.appendChild(this.cells[x][y].htmlElement);
             }
 
             mainDiv.appendChild(newCellRow);

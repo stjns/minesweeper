@@ -1,5 +1,6 @@
-export class GameCell {
-    readonly el: HTMLDivElement;
+// An individual cell within the minefield
+export class Cell {
+    readonly htmlElement: HTMLDivElement;
     private readonly cellRevealCallback: Function;
     private mineNeighbors = 0; 
 
@@ -9,62 +10,62 @@ export class GameCell {
     private disabled = false;
 
     constructor(cellRevealCallback: Function) {
-        this.el = <HTMLDivElement>document.createElement('div');
+        this.htmlElement = <HTMLDivElement>document.createElement('div');
         this.cellRevealCallback = cellRevealCallback;
 
-        this.el.classList.add("game-cell");
-        this.el.classList.add('un-revealed');
+        this.htmlElement.classList.add('game-cell');
+        this.htmlElement.classList.add('un-revealed');
 
-        this.el.addEventListener('contextmenu', (e) => {
+        this.htmlElement.addEventListener('contextmenu', (e) => {
             e.preventDefault();
-            this.onFlagToggle();
+            this.toggleFlag();
         });
-        this.el.addEventListener('click', () => this.onCellClick());
+        this.htmlElement.addEventListener('click', () => this.reveal());
     }
 
+    //set a mine on this cell
     public arm(): void {
         this.mined = true;
         this.mineNeighbors = 1;
     }
 
+    //set the number that will appear on a cell
     public setMinedNeighbors(minedNeighbors: number) {
         if (!this.mined)
             this.mineNeighbors = minedNeighbors;
     }
 
+    //action when an unflagged cell is clicked
     public reveal() {
-        if (!this.flagged && !this.revealed) {
+        if (!this.disabled && !this.flagged && !this.revealed) {
             this.revealed = true;
 
             if (this.mined) {
                 this.cellRevealCallback(true);
-                this.el.classList.add('exploded');
-                this.el.innerHTML = '&#x1f4a3;'
+                this.htmlElement.classList.add('exploded');
+                this.htmlElement.innerHTML = '&#x1f4a3;'
             } else {
                 this.cellRevealCallback(false);
                 if (this.mineNeighbors > 0)
-                    this.el.textContent = this.numNearbyMines().toString();
+                    this.htmlElement.textContent = this.numNearbyMines().toString();
                 
             }
 
-            this.el.classList.remove('un-revealed');
+            this.htmlElement.classList.remove('un-revealed');
         } 
     }
 
+    //when the game is over disable the cell from being clicked 
     public disable = () => this.disabled = true;
 
-    private onCellClick(): void {
-        if (!this.disabled && !this.isRevealed() && !this.isFlagged()) {
-            this.reveal();
-        }
-    }
 
-    public onFlagToggle(): void {
+    //add/remove flag from an unrevelead cell
+    public toggleFlag(): void {
         if (!this.disabled && !this.isRevealed()) {
             if (!this.isFlagged()) {
-                this.el.innerHTML = '&#x26f3;';
+                this.htmlElement.innerHTML = '&#x26f3;';
             } else {
-                this.el.textContent = ' ';
+                this.htmlElement.textContent = ' ';
             }
 
             this.flagged = !this.flagged;
