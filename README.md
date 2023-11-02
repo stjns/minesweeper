@@ -1,9 +1,16 @@
 # minesweeper
 Minesweeper
 
-What happened with a software engineering manager that misses programming had an evening to myself. 
-The initial version was written in about 2 hours with some very rusty programming skills. About
-an hour of refinement has gone in since then. 
+What happened when a software engineering manager that misses programming had an evening to myself. 
+The initial version was written in about 2 hours with some very rusty programming skills. It's had
+about four hours of work total at this point. 
+
+TODO
+1. better win/lose logic/actions
+2. convenience feature to mark multiple flags at once
+3. mobile optimization/controls
+4. actual styling
+5. ability to generate a "no guess" version
 
 I'm currently using Parcel, so to run
 
