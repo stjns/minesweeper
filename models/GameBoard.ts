@@ -29,7 +29,7 @@ export class GameBoard {
         const cellArray: CellCoordinate[] = [];
         const mineMap: CellCoordinate[] = [];
 
-        //populate full cellArray
+        //populate full cellArray with all possible cell coordinates
         for(let y = 0; y < height; y++) {
             for(let x = 0; x < width; x++) {
                 cellArray.push(new CellCoordinate(x, y));
@@ -57,9 +57,6 @@ export class GameBoard {
         return mineMap
     }
 
-    private isMined = (x: number, y: number, map: CellCoordinate[]) => 
-        map.filter(m => m.x === x && m.y === y).length === 1;
-
     public populateBoard(): void {
         //first generate the board
         for(let y = 0; y < this.boardHeight; y++) {
@@ -72,7 +69,6 @@ export class GameBoard {
     }
 
     private calculateMinedNeighbors(): void {
-        //then calculate the mined neighbors
         for(let y = 0; y < this.boardHeight; y++) {
             for(let x = 0; x < this.boardWidth; x++) {
                 if(!this.cells[x][y].isMined()) {
@@ -113,6 +109,8 @@ export class GameBoard {
      * x, y: coordinates for the revealed cell
      */
     private cellRevealCallback(mined: boolean, x: number, y: number) {
+        //on the first click, we need to calculate the mines before we
+        //do anything else
         if (this.virginBoard) {
             const mineMap = this.generateMineMap(
                 x,
@@ -132,7 +130,7 @@ export class GameBoard {
             this.calculateMinedNeighbors();
             this.virginBoard = false;
         }
-
+    
         if (mined) {
             //explode
             this.disableAllCells();
@@ -159,11 +157,13 @@ export class GameBoard {
             if (this.userHasWon()) {
                 this.flagAllMines();
                 this.disableAllCells();
+                //TODO replace alert with something better
                 alert("You win!");
             }
         }
     }
 
+    //used when the user has won to flag remaining mines
     private flagAllMines(): void {
         for (const row of this.cells) {
             for (const cell of row) {
@@ -173,6 +173,8 @@ export class GameBoard {
         }
     }
 
+    //check to see if the user has won
+    //TODO probably a smarter way to do this?
     private userHasWon(): boolean {
         for(const row of this.cells) {
             for (const cell of row) {
@@ -184,6 +186,7 @@ export class GameBoard {
         return true;
     }
 
+    //used when the user has won/lost to prevent further clicks
     private disableAllCells(): void {
         for(const row of this.cells) {
             for(const cell of row) {
@@ -192,7 +195,8 @@ export class GameBoard {
         }
     }
 
-    public generateInitialBoard(): HTMLDivElement {
+    //start a new game!
+    public newGame(): HTMLDivElement {
         const mainDiv: HTMLDivElement = document.createElement("div");
 
         for(let y = 0; y < this.boardHeight; y++) {
