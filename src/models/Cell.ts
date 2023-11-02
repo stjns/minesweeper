@@ -2,6 +2,7 @@
 export class Cell {
     readonly htmlElement: HTMLDivElement;
     private readonly cellRevealCallback: Function;
+    private readonly cellFlagCallback: Function;
     private mineNeighbors = 0; 
 
     private mined = false;
@@ -9,9 +10,10 @@ export class Cell {
     private revealed = false;
     private disabled = false;
 
-    constructor(cellRevealCallback: Function) {
+    constructor(cellRevealCallback: Function, cellFlagCallback: Function) {
         this.htmlElement = <HTMLDivElement>document.createElement('div');
         this.cellRevealCallback = cellRevealCallback;
+        this.cellFlagCallback = cellFlagCallback;
 
         this.htmlElement.classList.add('game-cell');
         this.htmlElement.classList.add('un-revealed');
@@ -64,11 +66,12 @@ export class Cell {
         if (!this.disabled && !this.isRevealed()) {
             if (!this.isFlagged()) {
                 this.htmlElement.innerHTML = '&#x26f3;';
+                this.flagged = true;
+                this.cellFlagCallback();
             } else {
+                this.flagged = false;
                 this.htmlElement.textContent = ' ';
             }
-
-            this.flagged = !this.flagged;
         }
     }
 
