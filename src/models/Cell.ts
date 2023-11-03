@@ -66,12 +66,12 @@ export class Cell {
         if (!this.disabled && !this.isRevealed()) {
             if (!this.isFlagged()) {
                 this.htmlElement.innerHTML = '&#x26f3;';
-                this.flagged = true;
-                this.cellFlagCallback();
             } else {
-                this.flagged = false;
                 this.htmlElement.textContent = ' ';
             }
+
+            this.flagged = !this.flagged;
+            this.cellFlagCallback(this.flagged);
         }
     }
 
