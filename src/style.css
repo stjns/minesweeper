@@ -1,0 +1,39 @@
+body {
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#game-board {
+    margin: 25px;
+    display: flex;
+}
+
+.game-cell {
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    text-align: center;
+    margin: 0;
+    border: 1px solid gray;
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    color: black;
+}
+
+.game-cell.un-revealed {
+    background-color: black;
+    color: white
+}
+
+.game-cell.exploded {
+    background-color: red;
+}
+
+.cell-row {
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
