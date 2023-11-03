@@ -21,11 +21,16 @@ body {
     height: 30px;
     background-color: white;
     color: black;
+    font-weight: bold;
 }
 
 .game-cell.un-revealed {
     background-color: black;
     color: white
+}
+
+.game-cell.unexploded-mine {
+    background-color: yellow;
 }
 
 .game-cell.exploded {
