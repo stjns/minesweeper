@@ -1,5 +1,6 @@
 import { Cell } from './Cell';
 import { CellCoordinate } from './CellCoordinate';
+import { Stopwatch } from './Stopwatch';
 
 export class Minefield {
     readonly boardWidth: number;
@@ -10,6 +11,8 @@ export class Minefield {
 
     private cells: Cell[][]; //the virtual representation of the board
 
+    private stopwatch: Stopwatch;
+
     constructor(width: number, height: number, mines: number) {
         this.boardHeight = height;
         this.boardWidth = width;
@@ -18,6 +21,7 @@ export class Minefield {
         this.cells = [...Array(width)].map(e => Array(height));
 
         this.populateBoard();
+        this.stopwatch = new Stopwatch();
     }
 
     //create a randomized minefield based on height/width/mines specified
@@ -59,11 +63,13 @@ export class Minefield {
     }
 
     public populateBoard(): void {
-        //first generate the board
         for(let y = 0; y < this.boardHeight; y++) {
             for(let x = 0; x < this.boardWidth; x++) {
                 const newCell = new Cell((result:boolean) => 
-                    this.cellRevealCallback(result, x, y));
+                    this.cellRevealCallback(result, x, y),
+                    () => {
+                        if(this.checkForWinByFlags()) this.winnerWinner();
+                    });
                 this.cells[x][y] = newCell;
             }
         }
@@ -131,10 +137,12 @@ export class Minefield {
 
             this.calculateMinedNeighbors();
             this.virginBoard = false;
+            this.stopwatch.start();
         }
     
         if (mined) {
             //explode
+            this.stopwatch.stop();
             this.disableAllCells();
         }
         else if (this.cells[x][y].isEmpty()) {
@@ -156,28 +164,31 @@ export class Minefield {
         }
         else {
             //check for win
-            if (this.userHasWon()) {
-                this.flagAllMines();
-                this.disableAllCells();
-                //TODO replace alert with something better
-                alert('You win!');
-            }
+            if (this.checkForWin()) this.winnerWinner();
         }
     }
 
     //used when the user has won to flag remaining mines
-    private flagAllMines(): void {
+    private flagAllMinesRevealUnrevealed(): void {
         for (const row of this.cells) {
             for (const cell of row) {
                 if (cell.isMined() && !cell.isFlagged())
                     cell.toggleFlag();
+                else if (!cell.isRevealed())
+                    cell.reveal();
             }
         }
     }
 
+    private winnerWinner(): void {
+        this.stopwatch.stop();
+        this.flagAllMinesRevealUnrevealed();
+        this.disableAllCells();
+    }
+
     //check to see if the user has won
     //TODO probably a smarter way to do this?
-    private userHasWon(): boolean {
+    private checkForWin(): boolean {
         for(const row of this.cells) {
             for (const cell of row) {
                 if (!cell.isRevealed() && !cell.isMined())
@@ -187,6 +198,11 @@ export class Minefield {
 
         return true;
     }
+
+    //check to see if a user has won by flagging all mines
+    private checkForWinByFlags = () => this.cells
+        .flatMap(r => r.filter(c => c.isMined() && !c.isFlagged()))
+        .length === 0;
 
     //used when the user has won/lost to prevent further clicks
     private disableAllCells(): void {
@@ -211,6 +227,7 @@ export class Minefield {
 
             mainDiv.appendChild(newCellRow);
         }
+        mainDiv.appendChild(this.stopwatch.timer);
         return mainDiv;
     }
 }
