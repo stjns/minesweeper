@@ -30,6 +30,10 @@ body {
 }
 
 .game-cell.unexploded-mine {
+    background-color: lightgray;
+}
+
+.game-cell.bad-flag {
     background-color: yellow;
 }
 

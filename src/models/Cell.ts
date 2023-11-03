@@ -94,6 +94,9 @@ export class Cell {
             this.htmlElement.classList.add('unexploded-mine');
             this.htmlElement.innerHTML = this.BOMB_CODE;
         }
+        else if (!this.mined && this.flagged) {
+            this.htmlElement.classList.add('bad-flag')
+        }
     }
 
 
