@@ -110,6 +110,31 @@ export class Minefield {
             }
         }
     }
+
+    //right after the first move we need to do a bunch of stuff,
+    //like calculating the minefield, enabling flagging
+    private firstMove(x: number, y: number): void {
+        this.mineCounter.adjustCount(this.mineCount);
+        const mineMap = this.generateMineMap(
+            x,
+            y,
+            this.boardWidth, 
+            this.boardHeight, 
+            this.mineCount
+        );
+
+        for(let y = 0; y < this.boardHeight; y++) {
+            for(let x = 0; x < this.boardWidth; x++) {
+                if (mineMap.some(c => c.x === x && c.y === y))
+                    this.cells[x][y].arm();
+                this.cells[x][y].enableFlagging();
+            }
+        }
+
+        this.calculateMinedNeighbors();
+        this.virginBoard = false;
+        this.stopwatch.start();
+    }
     
     /*
      * When a cell is revealed, this function is run to see what actions
@@ -124,27 +149,7 @@ export class Minefield {
     private cellRevealCallback(mined: boolean, x: number, y: number) {
         //on the first click, we need to calculate the mines before we
         //do anything else
-        if (this.virginBoard) {
-            this.mineCounter.adjustCount(this.mineCount);
-            const mineMap = this.generateMineMap(
-                x,
-                y,
-                this.boardWidth, 
-                this.boardHeight, 
-                this.mineCount
-            );
-
-            for(let y = 0; y < this.boardHeight; y++) {
-                for(let x = 0; x < this.boardWidth; x++) {
-                    if (mineMap.some(c => c.x === x && c.y === y))
-                        this.cells[x][y].arm();
-                }
-            }
-
-            this.calculateMinedNeighbors();
-            this.virginBoard = false;
-            this.stopwatch.start();
-        }
+        if (this.virginBoard) this.firstMove(x, y);
     
         if (mined) {
             //explode
