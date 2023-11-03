@@ -32,7 +32,7 @@ export class Stopwatch {
     }
 
     private render(time: number) {
-        this.timer.innerHTML = (time / 1000).toFixed(3);
+        this.timer.innerHTML = (time / 1000).toFixed(1);
     }
 
 }
