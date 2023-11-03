@@ -10,7 +10,4 @@ TODO
 - mobile optimization/controls
 - actual styling
 - ability to generate a "no guess" version
-- win when all mines are marked
-- mine counter
 - enforcement/error handling for width/height/mines
-- show incorrect flags/unflagged mines on lose
