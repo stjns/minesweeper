@@ -9,6 +9,7 @@ export class Cell {
     private flagged = false;
     private revealed = false;
     private disabled = false;
+    private flaggingEnabled = false;
 
     constructor(cellRevealCallback: Function, cellFlagCallback: Function) {
         this.htmlElement = <HTMLDivElement>document.createElement('div');
@@ -29,6 +30,11 @@ export class Cell {
     public arm(): void {
         this.mined = true;
         this.mineNeighbors = 1;
+    }
+
+    //needed to prevent a bug for flagging before the game has started
+    public enableFlagging(): void {
+        this.flaggingEnabled = true;
     }
 
     //set the number that will appear on a cell
@@ -63,7 +69,7 @@ export class Cell {
 
     //add/remove flag from an unrevelead cell
     public toggleFlag(): void {
-        if (!this.disabled && !this.isRevealed()) {
+        if (this.flaggingEnabled && !this.disabled && !this.isRevealed()) {
             if (!this.isFlagged()) {
                 this.htmlElement.innerHTML = '&#x26f3;';
             } else {
