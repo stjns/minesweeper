@@ -11,6 +11,7 @@ export class Cell {
     private revealed = false;
     private disabled = false;
     private flaggingEnabled = false;
+    private touchTimer = 0;
 
     private readonly BOMB_CODE = '&#x1f4a3;';
     private readonly FLAG_CODE = '&#x26f3;';
@@ -28,6 +29,23 @@ export class Cell {
             this.toggleFlag();
         });
         this.htmlElement.addEventListener('click', () => this.reveal());
+        this.htmlElement.addEventListener('touchstart', (e) => this.touchHandler(e));
+        this.htmlElement.addEventListener('touchend', () => this.cancelTouch());
+        this.htmlElement.addEventListener('touchmove', () => this.cancelTouch());
+    }
+
+    private touchHandler(e: TouchEvent) {
+        if (!this.touchTimer) {
+            this.touchTimer = setTimeout(() => {
+                e.preventDefault();
+                this.touchTimer = 0;
+                this.toggleFlag();
+            }, 250);
+        }
+    }
+
+    private cancelTouch(): void {
+        clearTimeout(this.touchTimer);
     }
 
     //set a mine on this cell

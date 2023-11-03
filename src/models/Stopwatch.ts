@@ -1,6 +1,5 @@
 export class Stopwatch {
     private interval: number = 0;
-    private clock: number = 0;
     private offset: number = 0;
     readonly timer: HTMLDivElement;
     
