@@ -6,6 +6,7 @@ body {
 #game-board {
     margin: 25px;
     display: flex;
+    touch-action: manipulation;
 }
 
 .game-cell {
