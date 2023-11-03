@@ -219,7 +219,7 @@ export class Minefield {
     private disableAllCells(): void {
         for(const row of this.cells) {
             for(const cell of row) {
-                cell.disable();
+                cell.gameOver();
             }
         }
     }
