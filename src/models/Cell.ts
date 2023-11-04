@@ -35,9 +35,9 @@ export class Cell {
     }
 
     private touchHandler(e: TouchEvent) {
+        e.preventDefault();
         if (!this.touchTimer) {
             this.touchTimer = setTimeout(() => {
-                e.preventDefault();
                 this.touchTimer = 0;
                 this.toggleFlag();
             }, 250);
@@ -45,7 +45,10 @@ export class Cell {
     }
 
     private cancelTouch(): void {
-        clearTimeout(this.touchTimer);
+        if (this.touchTimer) {
+            clearTimeout(this.touchTimer);
+            this.reveal();
+        }
     }
 
     //set a mine on this cell
