@@ -31,7 +31,9 @@ export class Stopwatch {
     }
 
     private render(time: number) {
-        this.timer.innerHTML = (time / 1000).toFixed(1);
+        const minutes = Math.floor(time / 60000)
+        const seconds = ((time % 60000) / 1000).toFixed(0)
+        this.timer.innerHTML = `${minutes}:${seconds}`;
     }
 
 }
