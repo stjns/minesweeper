@@ -70,13 +70,47 @@ export class Minefield {
             for(let x = 0; x < this.boardWidth; x++) {
                 const newCell = new Cell((result:boolean) => 
                     this.cellRevealCallback(result, x, y),
-                    (flagged: boolean) => {
-                        if (flagged) this.mineCounter.adjustCount(-1);
-                        else this.mineCounter.adjustCount(1);
-                        if(this.checkForWinByFlags()) this.winnerWinner();
-                    });
+                    (flagged: boolean) => this.cellFlagCallback(flagged),
+                    (nearby: number) => this.multiFlagCallback(x, y, nearby));
                 this.cells[x][y] = newCell;
             }
+        }
+    }
+
+    //when a cell gets flagged, we need to recalculate the number
+    //of remaining mines. Also, this can flag other cells if the
+    //user uses the convience feature of flagging a "numbered" 
+    //revealed cell.
+    private cellFlagCallback(flagged: boolean): void {
+        if (flagged) this.mineCounter.adjustCount(-1);
+        else this.mineCounter.adjustCount(1);
+        if(this.checkForWinByFlags()) this.winnerWinner();
+    }
+
+    private multiFlagCallback(x: number, y: number, nearbyMined: number): void {
+        const nearbyUnflagged: Cell[] = [];
+        let nearbyCount = 0;
+
+        const minY = y === 0 ? 0 : y - 1;
+        const maxY = y === this.boardHeight - 1 ? y : y+1;
+        const minX = x === 0 ? 0 : x-1;
+        const maxX = x === this.boardWidth - 1 ? x : x+1;
+
+        for(let itY = minY; itY <= maxY; itY++) {
+            for (let itX = minX; itX <= maxX; itX++) {
+                if (itX === x && itY === y) continue; //no need to count myself
+                const currentCell = this.cells[itX][itY];
+
+                if (!currentCell.isRevealed()) nearbyCount++;
+
+                if (!currentCell.isRevealed() && !currentCell.isFlagged()) {
+                    nearbyUnflagged.push(currentCell);
+                }
+            }
+        }
+
+        if (nearbyCount === nearbyMined) {
+            nearbyUnflagged.forEach(n => n.toggleFlag());
         }
     }
 
