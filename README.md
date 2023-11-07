@@ -6,7 +6,6 @@ about four hours of work total at this point.
 
 TODO
 - better win/lose actions
-- convenience feature to mark multiple flags at once
 - actual styling
 - ability to generate a "no guess" version
 - enforcement/error handling for width/height/mines
