@@ -49,6 +49,7 @@ export class Cell {
     private cancelTouch(): void {
         if (this.touchTimer) {
             clearTimeout(this.touchTimer);
+            this.touchTimer = 0;
             this.reveal();
         }
     }
