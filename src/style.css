@@ -5,8 +5,18 @@ body {
 
 #game-board {
     margin: 25px;
-    display: flex;
     touch-action: manipulation;
+    padding: 5px;
+    display: inline-block;
+}
+
+#game-board > div {
+    margin: 3px;
+}
+
+.minefield {
+    box-shadow: gray 0px 0px 2px 0px;
+    display: inline-block;
 }
 
 .game-cell {
@@ -17,16 +27,42 @@ body {
     flex-direction: column;
     text-align: center;
     margin: 0;
-    border: 1px solid gray;
     width: 30px;
     height: 30px;
     background-color: white;
     color: black;
     font-weight: bold;
+    box-shadow: gray 0px 0px 2px 0px inset;
 }
 
+.game-cell.n1 {
+    color: blue;
+}
+.game-cell.n2 {
+    color: green;
+}
+.game-cell.n3 {
+    color: red;
+}
+.game-cell.n4 {
+    color: darkblue;
+}
+.game-cell.n5 {
+    color: darkred;
+}
+.game-cell.n6 {
+    color: teal;
+}
+.game-cell.n7 {
+    color: black;
+}
+.game-cell.n8 {
+    color: black;
+}
+
+
 .game-cell.un-revealed {
-    background-color: black;
+    background: darkblue;
     color: white
 }
 
@@ -46,4 +82,17 @@ body {
     display: flex;
     margin: 0;
     padding: 0;
+}
+
+.status-bar {
+    display:block;
+}
+
+.status-bar > div {
+    display: inline-block;
+    width: 50%;
+}
+
+.game-timer {
+    text-align: right;
 }

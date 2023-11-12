@@ -1,6 +1,7 @@
 export class MineCounter {
     readonly counterDiv: HTMLDivElement;
     private currentCount: number;
+    private readonly BOMB_CODE = '&#x1f4a3;';
 
     constructor(initialCount: number) {
         this.counterDiv = document.createElement('div');
@@ -9,12 +10,12 @@ export class MineCounter {
         this.render();
     }
 
-    public adjustCount(change:number): void {
-        this.currentCount += change;
+    public set(count:number): void {
+        this.currentCount = count;
         this.render();
     }
 
     private render(): void {
-        this.counterDiv.textContent = `Remaining Mines: ${this.currentCount}`;
+        this.counterDiv.innerHTML = `${this.BOMB_CODE}: ${this.currentCount}`;
     }
 }

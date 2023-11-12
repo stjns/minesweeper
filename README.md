@@ -1,8 +1,8 @@
 # minesweeper
 
 What happened when a software engineering manager that misses programming had an evening to myself. 
-The initial version was written in about 2 hours with some very rusty programming skills. It's had
-about four hours of work total at this point. 
+The initial version was written in about 2 hours with some very rusty programming skills. The current
+version does not represent substantially more work than that.
 
 TODO
 - better win/lose actions

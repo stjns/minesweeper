@@ -1,30 +1,41 @@
 import { Cell } from './Cell';
 import { CellCoordinate } from './CellCoordinate';
-import { Stopwatch } from './Stopwatch';
-import { MineCounter } from './MineCounter';
 
 export class Minefield {
     readonly boardWidth: number;
     readonly boardHeight: number;
     readonly mineCount: number;
+    private remainingMines = 0;
+
+    private readonly gameStartCallback: Function;
+    private readonly gameEndCallback: Function;
+    private readonly mineCountCallback: Function;
 
     private virginBoard = true; //new, untouched minefield
 
     private cells: Cell[][]; //the virtual representation of the board
 
-    private stopwatch: Stopwatch;
-    private mineCounter: MineCounter;
-
-    constructor(width: number, height: number, mines: number) {
+    constructor(
+        width: number, 
+        height: number, 
+        mines: number,
+        gameStartCallback: Function,
+        gameEndCallback: Function,
+        mineCountCallback: Function) {
         this.boardHeight = height;
         this.boardWidth = width;
         this.mineCount = mines;
+        this.remainingMines = mines;
+
+        this.gameEndCallback = gameEndCallback;
+        this.gameStartCallback = gameStartCallback;
+        this.mineCountCallback = mineCountCallback;
+
+        this.mineCountCallback(mines);
 
         this.cells = [...Array(width)].map(e => Array(height));
 
         this.populateBoard();
-        this.stopwatch = new Stopwatch();
-        this.mineCounter = new MineCounter(0);
     }
 
     //create a randomized minefield based on height/width/mines specified
@@ -82,8 +93,8 @@ export class Minefield {
     //user uses the convience feature of flagging a "numbered" 
     //revealed cell.
     private cellFlagCallback(flagged: boolean): void {
-        if (flagged) this.mineCounter.adjustCount(-1);
-        else this.mineCounter.adjustCount(1);
+        if (flagged) this.mineCountCallback(--this.remainingMines);
+        else this.mineCountCallback(++this.remainingMines);
         if(this.checkForWinByFlags()) this.winnerWinner();
     }
 
@@ -148,7 +159,6 @@ export class Minefield {
     //right after the first move we need to do a bunch of stuff,
     //like calculating the minefield, enabling flagging
     private firstMove(x: number, y: number): void {
-        this.mineCounter.adjustCount(this.mineCount);
         const mineMap = this.generateMineMap(
             x,
             y,
@@ -167,7 +177,7 @@ export class Minefield {
 
         this.calculateMinedNeighbors();
         this.virginBoard = false;
-        this.stopwatch.start();
+        this.gameStartCallback();
     }
     
     /*
@@ -187,7 +197,7 @@ export class Minefield {
     
         if (mined) {
             //explode
-            this.stopwatch.stop();
+            this.gameEndCallback();
             this.disableAllCells();
         }
         else if (this.cells[x][y].isEmpty()) {
@@ -226,7 +236,7 @@ export class Minefield {
     }
 
     private winnerWinner(): void {
-        this.stopwatch.stop();
+        this.gameEndCallback();
         this.flagAllMinesRevealUnrevealed();
         this.disableAllCells();
     }
@@ -272,8 +282,6 @@ export class Minefield {
 
             mainDiv.appendChild(newCellRow);
         }
-        mainDiv.appendChild(this.mineCounter.counterDiv);
-        mainDiv.appendChild(this.stopwatch.timer);
         return mainDiv;
     }
 }
