@@ -5,10 +5,12 @@ export class Stopwatch {
     
     constructor() {
         this.timer = document.createElement('div');
+        this.timer.classList.add('game-timer');
         this.render(0);
     }
 
     public start(): void {
+        this.reset();
         if (!this.interval) {
             this.offset = Date.now();
             this.interval = setInterval(() => this.update(),100);
@@ -23,6 +25,7 @@ export class Stopwatch {
     public stop(): void {
         if (this.interval) {
             clearInterval(this.interval);
+            this.interval = 0;
         }
     }
 
@@ -31,8 +34,8 @@ export class Stopwatch {
     }
 
     private render(time: number) {
-        const minutes = Math.floor(time / 60000)
-        const seconds = ((time % 60000) / 1000).toFixed(0)
+        const minutes = Math.floor(time / 60000).toString().padStart(2, '0');
+        const seconds = ((time % 60000) / 1000).toFixed(1).padStart(4, '0');
         this.timer.innerHTML = `${minutes}:${seconds}`;
     }
 

@@ -67,8 +67,9 @@ export class Cell {
 
     //set the number that will appear on a cell
     public setMinedNeighbors(minedNeighbors: number) {
-        if (!this.mined)
+        if (!this.mined) {
             this.mineNeighbors = minedNeighbors;
+        }
     }
 
     //action when an unflagged cell is clicked
@@ -83,8 +84,10 @@ export class Cell {
                 this.htmlElement.innerHTML = this.BOMB_CODE;
             } else {
                 this.cellRevealCallback(false);
-                if (this.mineNeighbors > 0)
-                    this.htmlElement.textContent = this.numNearbyMines().toString();
+                if (this.mineNeighbors > 0) {
+                    this.htmlElement.textContent = this.mineNeighbors.toString();
+                    this.htmlElement.classList.add(`n${this.mineNeighbors}`);
+                }
                 
             }
 
