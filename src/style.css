@@ -1,13 +1,77 @@
-body {
-    font-size: 14px;
-    font-family: Arial, Helvetica, sans-serif;
+/* Palette */
+:root {
+    --dark_primary: #00174a;
+    --dark_secondary: #022775;
+    --light_primary: #dbe7ff;
+    --light_secondary: #99b9ff;
+    --font_light: #fff;
+    --font_dark: #000;
 }
 
-#game-board {
-    margin: 25px;
-    touch-action: manipulation;
-    padding: 5px;
+/* General */
+body {
+    /* display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap; */
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--dark_primary);
+    color: var(--font_light);
+}
+
+fieldset {
+    border-color: var(--light_secondary);
+    background-color: var(--dark_secondary);
+}
+
+#game-board_controls {
+    display: flex;
+    /* align-items: center; */
+}
+
+/* controls */
+#controls {
     display: inline-block;
+}
+
+#controls fieldset {
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    box-shadow: 0 0 8px var(--font_dark);
+}
+
+#controls fieldset input{
+    border-color: var(--light_secondary);
+    border-radius: 5px;
+    border-width: 1px;
+    margin-bottom: 5px;
+    background-color: var(--dark_primary);
+    color: var(--font_light);
+}
+
+/* input::placeholder, input::-moz-placeholder, input::-webkit-input-placeholder {
+    color: pink;
+} */
+
+#controls fieldset button {
+    background-color: var(--dark_primary);
+    border: 1px solid var(--light_secondary);
+    color: var(--font_light);
+    border-radius: 5px;
+    padding: 2px;
+}
+
+
+/* game-board */
+#game-board {
+    /* margin: 25px; */
+    touch-action: manipulation;
+    padding: 2px;
+    display: inline-block;
+    border: 2px solid var(--light_secondary);
+    border-radius: 8px;
+    background-color: var(--dark_secondary);
 }
 
 #game-board > div {

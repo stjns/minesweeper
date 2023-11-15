@@ -11,13 +11,19 @@
         Right click/long press on a "numbered" cell to flag all cells it touches if the number of unrevealed cells
         it touches matches the number on the cell.
     </p>
-    <div id="controls">
-        <label>Width:</label><input placeholder="10" min="5" max="40" id="txt-board-width" type="number">
-        <label>Height:</label><input placeholder="10" min="5" max="40" id="txt-board-height" type="number">
-        <label>Mines:</label><input placeholder="20" min="1" id="txt-mines" type="number">
-        <button id="btn-new-game">New Game</button>
+
+    <div id="game-board_controls">
+        <div id="game-board"></div>
+        <form id="controls">
+            <fieldset>
+                <legend>Controls</legend>
+                <label>Width:</label><input placeholder="10" min="5" max="40" id="txt-board-width" type="number">
+                <label>Height:</label><input placeholder="10" min="5" max="40" id="txt-board-height" type="number">
+                <label>Mines:</label><input placeholder="20" min="1" id="txt-mines" type="number">
+                <button id="btn-new-game">New Game</button>
+            </fieldset>
+        </form>
     </div>
-    <div id="game-board"></div>
 
     <p>
         Project source at <a href="https://github.com/stjns/minesweeper">https://github.com/stjns/minesweeper</a>
