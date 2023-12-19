@@ -4,6 +4,7 @@ export class Cell {
     private readonly cellRevealCallback: Function;
     private readonly cellFlagCallback: Function;
     private readonly multiFlagCallback: Function;
+    private readonly chordCallback: Function;
     private mineNeighbors = 0; 
 
     private mined = false;
@@ -17,11 +18,16 @@ export class Cell {
     private readonly BOMB_CODE = '&#x1f4a3;';
     private readonly FLAG_CODE = '&#x26f3;';
 
-    constructor(cellRevealCallback: Function, cellFlagCallback: Function, multiFlagCallback: Function) {
+    constructor(
+        cellRevealCallback: Function, 
+        cellFlagCallback: Function, 
+        multiFlagCallback: Function,
+        chordCallback: Function) {
         this.htmlElement = <HTMLDivElement>document.createElement('div');
         this.cellRevealCallback = cellRevealCallback;
         this.cellFlagCallback = cellFlagCallback;
         this.multiFlagCallback = multiFlagCallback;
+        this.chordCallback = chordCallback;
 
         this.htmlElement.classList.add('game-cell');
         this.htmlElement.classList.add('un-revealed');
@@ -92,7 +98,9 @@ export class Cell {
             }
 
             this.htmlElement.classList.remove('un-revealed');
-        } 
+        } else if (this.revealed && this.mineNeighbors > 0) { //chording
+            this.chordCallback(this.mineNeighbors);
+        }
     }
 
     //when the game is over disable the cell from being clicked 
