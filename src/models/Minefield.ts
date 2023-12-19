@@ -1,5 +1,6 @@
 import { Cell } from './Cell';
 import { CellCoordinate } from './CellCoordinate';
+import { NearbyCellMap } from './NearbyCellMap';
 
 export class Minefield {
     readonly boardWidth: number;
@@ -82,10 +83,46 @@ export class Minefield {
                 const newCell = new Cell((result:boolean) => 
                     this.cellRevealCallback(result, x, y),
                     (flagged: boolean) => this.cellFlagCallback(flagged),
-                    (nearby: number) => this.multiFlagCallback(x, y, nearby));
+                    (nearby: number) => this.multiFlagCallback(x, y, nearby),
+                    (nearby: number) => this.chordCallback(x, y, nearby));
                 this.cells[x][y] = newCell;
             }
         }
+    }
+
+    //chording is when you do a normal click on a revealed cell in order
+    //to reveal its unrevealed neighbors. If the number of nearby flagged cells
+    //equals the number on the clicked cell, each unflagged, unrevealed cell should
+    //be revealed. This can result in game loss. 
+    private chordCallback(x: number, y: number, mineNeighbors: number) {
+        const cellMap = this.mapNearbyCells(x, y);
+
+        if (cellMap.Flagged.length === mineNeighbors) {
+            cellMap.Unflagged.forEach(cell => cell.reveal());
+        }
+    }
+
+    //get a map of all nearby cells and their states
+    private mapNearbyCells(x: number, y: number): NearbyCellMap {
+        const cellMap = new NearbyCellMap();
+
+        const minY = y === 0 ? 0 : y - 1;
+        const maxY = y === this.boardHeight - 1 ? y : y+1;
+        const minX = x === 0 ? 0 : x-1;
+        const maxX = x === this.boardWidth - 1 ? x : x+1;
+
+        for(let itY = minY; itY <= maxY; itY++) {
+            for (let itX = minX; itX <= maxX; itX++) {
+                if (itX === x && itY === y) continue; //no need to count myself
+                const currentCell = this.cells[itX][itY];
+
+                if (!currentCell.isRevealed()) cellMap.Unrevealed++;
+                if (!currentCell.isRevealed() && currentCell.isFlagged()) cellMap.Flagged.push(currentCell);
+                if (!currentCell.isRevealed() && !currentCell.isFlagged()) cellMap.Unflagged.push(currentCell);
+            }
+        }
+
+        return cellMap;
     }
 
     //when a cell gets flagged, we need to recalculate the number
@@ -99,29 +136,10 @@ export class Minefield {
     }
 
     private multiFlagCallback(x: number, y: number, nearbyMined: number): void {
-        const nearbyUnflagged: Cell[] = [];
-        let nearbyCount = 0;
+        const cellMap = this.mapNearbyCells(x, y);
 
-        const minY = y === 0 ? 0 : y - 1;
-        const maxY = y === this.boardHeight - 1 ? y : y+1;
-        const minX = x === 0 ? 0 : x-1;
-        const maxX = x === this.boardWidth - 1 ? x : x+1;
-
-        for(let itY = minY; itY <= maxY; itY++) {
-            for (let itX = minX; itX <= maxX; itX++) {
-                if (itX === x && itY === y) continue; //no need to count myself
-                const currentCell = this.cells[itX][itY];
-
-                if (!currentCell.isRevealed()) nearbyCount++;
-
-                if (!currentCell.isRevealed() && !currentCell.isFlagged()) {
-                    nearbyUnflagged.push(currentCell);
-                }
-            }
-        }
-
-        if (nearbyCount === nearbyMined) {
-            nearbyUnflagged.forEach(n => n.toggleFlag());
+        if (cellMap.Unrevealed === nearbyMined) {
+            cellMap.Unflagged.forEach(n => n.toggleFlag());
         }
     }
 
