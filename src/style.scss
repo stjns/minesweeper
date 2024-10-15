@@ -1,6 +1,15 @@
+:root {
+    --footer-height:2.5rem;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-size: 14px;
     font-family: Arial, Helvetica, sans-serif;
+    margin:0;
 }
 
 #game-board {
@@ -95,4 +104,23 @@ body {
 
 .game-timer {
     text-align: right;
+}
+
+#page-container {
+    position:relative;
+    min-height: 100vh;
+}
+
+#content-wrapper {
+    padding:5px;
+    padding-bottom: var(--footer-height);
+}
+
+#footer {
+    position: absolute;
+    bottom:0;
+    width:100%;
+    background-color: rgba(0,0,0,0.1);
+    height: var(--footer-height);
+    padding:5px;
 }
