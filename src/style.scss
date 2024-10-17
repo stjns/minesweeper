@@ -3,6 +3,7 @@ $footer-height:2.5rem;
     --color-text:#000;
     --color-background:#f3f5f7;
     --color-background-subtle:#d7e0ed;
+    --color-primary:#0058d3;
 
 }
 
@@ -11,6 +12,7 @@ $footer-height:2.5rem;
         --color-text:#fff;
         --color-background:#05090f;
         --color-background-subtle:#121c2c;
+        --color-primary:#9ec6ff;
     }
 }
 
@@ -24,6 +26,13 @@ body {
     font-size: 14px;
     font-family: Arial, Helvetica, sans-serif;
     margin:0;
+}
+
+a {
+    background-color: transparent;
+    &:hover {
+        color:var(--color-primary);
+    }
 }
 
 #game-board {

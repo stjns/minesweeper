@@ -16,6 +16,7 @@ export class MineCounter {
     }
 
     private render(): void {
-        this.counterDiv.innerHTML = `${this.BOMB_CODE}: ${this.currentCount}`;
+        // this.counterDiv.innerHTML = `${this.BOMB_CODE}: ${this.currentCount}`;
+        this.counterDiv.innerHTML = `<span class="placeBomb"></span>: ${this.currentCount}`;
     }
 }
