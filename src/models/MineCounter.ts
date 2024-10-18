@@ -1,11 +1,22 @@
+import { Icon } from './Icons';
+
 export class MineCounter {
     readonly counterDiv: HTMLDivElement;
     private currentCount: number;
-    private readonly BOMB_CODE = '&#x1f4a3;';
+    private countContainer: HTMLSpanElement;
+    private readonly bomb = Icon.createIcon('mine');
 
     constructor(initialCount: number) {
         this.counterDiv = document.createElement('div');
         this.counterDiv.id = 'mine-counter';
+
+        this.counterDiv.appendChild(this.bomb);
+        this.bomb.style.verticalAlign = "bottom";
+
+        this.countContainer = document.createElement('span');
+        this.countContainer.id = 'count-container';
+        this.counterDiv.appendChild(this.countContainer);
+
         this.currentCount = initialCount;
         this.render();
     }
@@ -16,7 +27,6 @@ export class MineCounter {
     }
 
     private render(): void {
-        // this.counterDiv.innerHTML = `${this.BOMB_CODE}: ${this.currentCount}`;
-        this.counterDiv.innerHTML = `<span class="placeBomb"></span>: ${this.currentCount}`;
+        this.countContainer.innerText = ` : ${this.currentCount}`;
     }
 }

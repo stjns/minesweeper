@@ -19,7 +19,9 @@ $footer-height:2.5rem;
 * {
     box-sizing: border-box;
     color: var(--color-text);
-    background-color: var(--color-background);
+    &:not(svg) {
+        background-color: var(--color-background);
+    }
 }
 
 body {
@@ -58,10 +60,11 @@ a {
     align-content: center;
     flex-direction: column;
     text-align: center;
+    align-items: center;
     margin: 0;
     width: 2rem;
     height: 2rem;
-    background-color: --color-text;
+    background-color: var(--color-background);
     color: black;
     font-weight: bold;
     box-shadow: gray 0px 0px 2px 0px inset;
@@ -99,7 +102,7 @@ a {
 }
 
 .game-cell.unexploded-mine {
-    background-color: lightgray;
+    background-color: var(--color-background-subtle);
 }
 
 .game-cell.bad-flag {

@@ -1,3 +1,5 @@
+import { Icon } from "./Icons";
+
 // An individual cell within the minefield
 export class Cell {
     readonly htmlElement: HTMLDivElement;
@@ -15,6 +17,8 @@ export class Cell {
     private flaggingEnabled = false;
     private touchTimer = 0;
 
+    private readonly bomb = Icon.createIcon('mine', "1.5rem", "1.5rem");
+    private readonly flag = Icon.createIcon('flag', "1.5rem", "1.5rem");
     private readonly BOMB_CODE = '&#x1f4a3;';
     private readonly FLAG_CODE = '&#x26f3;';
 
@@ -87,7 +91,7 @@ export class Cell {
                 this.cellRevealCallback(true);
                 this.exploded = true;
                 this.htmlElement.classList.add('exploded');
-                this.htmlElement.innerHTML = this.BOMB_CODE;
+                this.htmlElement.appendChild(this.bomb);
             } else {
                 this.cellRevealCallback(false);
                 if (this.mineNeighbors > 0) {
@@ -109,7 +113,7 @@ export class Cell {
 
         if (this.mined && !this.flagged && !this.exploded) {
             this.htmlElement.classList.add('unexploded-mine');
-            this.htmlElement.innerHTML = this.BOMB_CODE;
+            this.htmlElement.appendChild(this.bomb);
         }
         else if (!this.mined && this.flagged) {
             this.htmlElement.classList.add('bad-flag')
@@ -121,7 +125,7 @@ export class Cell {
     public toggleFlag(): void {
         if (this.flaggingEnabled && !this.disabled && !this.isRevealed()) {
             if (!this.isFlagged()) {
-                this.htmlElement.innerHTML = this.FLAG_CODE;
+                this.htmlElement.appendChild(this.flag);
             } else {
                 this.htmlElement.textContent = ' ';
             }
